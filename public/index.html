@@ -3,28 +3,53 @@
 <head>
     <title>Imageboard</title>
     <link rel="stylesheet" href="/style/style.css">
+   
 </head>
 <body>
 
-<h1>my Imageboard</h1>
+<!-- <h1>my Imageboard</h1> -->
+<div id="logo-container" ref="logo">
+<img src="./img/logo.png" alt="logo" id="logo" >
 
+
+</div>
 <div id="main">
 
-<div id="grid-container">
-    <div id="images-container" v-for="images in images">
 
-       
+<form ref="form" >
+
+    <input v-model='title' type="text" name="title" placeholder="text" class="form">
+    <input v-model='description' type="text" name="description" placeholder="description" class="form">
+    <input v-model='username' type="text" name="username" placeholder="username" class="form">
+    <input type="file" @change='handleChange' name="file" accept="image/*" class="inputfile" id="file" class="form">
+    <label for="file" class="form">Choose a file</label>
+    <button @click='handleClick'class="form" >Submit</button>
+
+
+</form>
+
+
+<div id="grid-container">
+    
+    <div id="images-container" ref="box" class="box" v-for="images in images" >
+    
+        
+    
         <img v-bind:src="images.url" v-bind:alt="images.description">
 
         <div><p>{{images.title}}</p></div>
-        
+
             
     </div>
 
 </div>
 </div>
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
+<script>
+    gsap.from("#logo", 3, {opacity: 0, ease: "power1.out",})
+    gsap.from("#logo", 3, {scale: 1, ease: "power1.out",})
+</script>
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
     <script src="/js/script.js"></script>

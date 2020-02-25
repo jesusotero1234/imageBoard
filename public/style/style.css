@@ -1,12 +1,24 @@
+@import url('https://fonts.googleapis.com/css?family=Trade+Winds&display=swap');
+
 body {
-    background-color: aqua;
+    background-image: linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%);
     margin: 0;
+    box-sizing: border-box;
+    padding: 0;
+    overflow-x: hidden;
+}
+#logo-container{
+    width: 100%;
+    display: flex;
+    justify-content:center;
+    margin: 40px 40px;
 }
 
-img {
-    width: 300px;
-    height: 300px;
+#images-container>img {
+    width: 250px;
+    height: 250px;
     object-fit: cover;
+    border-radius: 25%;
 }
 
 #grid-container {
@@ -19,3 +31,73 @@ img {
     justify-content: space-evenly;
     text-align: center;
 }
+#images-container{
+    margin-top: 30px;
+    width: 300px;
+    height: 320px;
+    border: 2px solid #b12a5b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10%;
+}
+
+#images-container>div{
+    border-top: 2px solid #b12a5b;
+    width: 100%;
+   margin-top:5px;
+   border-radius: 25%; 
+}
+#images-container>div>p{
+    font-family: 'Trade Winds' ;
+}
+
+form{
+    display: flex;
+    justify-content: center;
+}
+
+input{
+  -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    margin-left: 50px;
+    border-bottom: 2px solid #b12a5b;
+    border-right: 2px solid #b12a5b;
+    border-bottom-right-radius: 18%;
+}
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputfile + label , button {
+	cursor: pointer;
+}
+.inputfile + label , button {
+  color: #fff !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: #b12a5b;
+    padding: 20px;
+    border-radius: 5px;
+    border: none;
+    transition: all 0.4s ease 0s;
+    line-height: 1px;
+    margin-left: 20px;
+  display: inline-block;
+}
+.inputfile:hover + label:hover  , button:hover {
+    background: transparent;
+    border: 2px solid black;
+    letter-spacing: 3px;
+    -webkit-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+    -moz-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+    box-shadow: 5px 40px -10px rgba(0, 0, 0, 0.57);
+    transition: all 0.4s ease 0s;
+}
+
