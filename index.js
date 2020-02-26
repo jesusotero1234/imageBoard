@@ -1,6 +1,12 @@
 const express = require('express');
 const app = express();
-const { imagesData, InsertUpload } = require('./db.js'); //?
+const {
+    imagesData,
+    InsertUpload,
+    singleImage,
+    saveComment,
+    comments
+} = require('./db.js'); //?
 const s3 = require('./s3');
 const { s3Url } = require('./config.json'); //?
 
@@ -29,6 +35,7 @@ const uploader = multer({
     }
 });
 
+app.use(express.json());
 //any routes are just for info/data
 
 app.get('/images', (req, res) => {
@@ -41,7 +48,6 @@ app.post('/upload', uploader.single('file'), s3.upload, (req, res) => {
     console.log('input', req.body, 'file', req.file);
 
     if (req.file) {
-        
         const url = s3Url + req.file.filename;
         InsertUpload(
             url,
@@ -67,6 +73,30 @@ app.post('/upload', uploader.single('file'), s3.upload, (req, res) => {
             success: false
         });
     }
+});
+
+app.post('/singleImage', (req, res) => {
+    //This will make a request to the database for the singleImage
+    console.log('SingleImage', req.body);
+
+    singleImage(req.body.id).then(response => {
+        res.json({ response });
+    });
+    // res.sendStatus(200)
+});
+
+app.post('/comments', (req, res) => {
+    //This will make a request to the database for the singleImage
+    console.log('SingleImage', req.body);
+
+    comments(req.body.id).then(response => {
+        res.json({ response });
+    });
+
+    // singleImage(req.body.id).then(response=>{
+    //     res.json({response})
+    // })
+    // res.sendStatus(200)
 });
 
 app.listen(8080, () => console.log('server is running'));

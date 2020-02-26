@@ -1,57 +1,117 @@
 <!doctype html>
 <html>
+
 <head>
     <title>Imageboard</title>
     <link rel="stylesheet" href="/style/style.css">
-   
+
 </head>
+
 <body>
 
-<!-- <h1>my Imageboard</h1> -->
-<div id="logo-container" ref="logo">
-<img src="./img/logo.png" alt="logo" id="logo" >
+    <div id="logo-container" ref="logo">
+        <img src="./img/logo.png" alt="logo" id="logo">
 
 
-</div>
-<div id="main">
+    </div>
+    <div id="main">
 
-
-<form ref="form" >
-
-    <input v-model='title' type="text" name="title" placeholder="text" class="form">
-    <input v-model='description' type="text" name="description" placeholder="description" class="form">
-    <input v-model='username' type="text" name="username" placeholder="username" class="form">
-    <input type="file" @change='handleChange' name="file" accept="image/*" class="inputfile" id="file" class="form">
-    <label for="file" class="form">Choose a file</label>
-    <button @click='handleClick'class="form" >Submit</button>
-
-
-</form>
-
-
-<div id="grid-container">
-    
-    <div id="images-container" ref="box" class="box" v-for="images in images" >
-    
+        <div id="modal-mask" v-if="id" @click='closeModal'></div>
+            <div id="modalShow" v-if="id">
+                
+                <modal :id='id' @addComment='handleComment(id)' >
+          
+                </modal>     
+        <!-- <h1>{{heading}}</h1>
+        <p  @click='handleClick'>i'm a p tag in the component</p> -->
         
-    
-        <img v-bind:src="images.url" v-bind:alt="images.description">
+        </div>
+     
 
-        <div><p>{{images.title}}</p></div>
+        <form ref="form">
 
-            
+            <input v-model='title' type="text" name="title" placeholder="text" class="form">
+            <input v-model='description' type="text" name="description" placeholder="description" class="form">
+            <input v-model='username' type="text" name="username" placeholder="username" class="form">
+            <input type="file" @change='handleChange' name="file" accept="image/*" class="inputfile" id="file" >
+            <label for="file" class="form">Choose a file</label>
+            <button @click='handleClick' class="form">Submit</button>
+
+
+        </form>
+
+
+        <div id="grid-container">
+
+            <div id="images-container" ref="box" class="box" v-for="images in images">
+
+
+
+                <img v-bind:src="images.url" v-bind:alt="images.description" @click='imageClicked(images.id)'>
+
+                <div>
+                    <p>{{images.title}}</p>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
     </div>
 
+<script id="first-modal" type="text/x-template">
+
+    <div>
+<div>
+    <img id="modal-img" v-bind:src="imagedata.url" v-bind:alt="imagedata.description">
 </div>
+<div >
+  <p>{{imagedata.title}}</p> 
+  <p>{{imagedata.description}}</p>
+   <p>uploaded by {{imagedata.username}} on {{imagedata.created_at}}</p>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
-<script>
-    gsap.from("#logo", 3, {opacity: 0, ease: "power1.out",})
-    gsap.from("#logo", 3, {scale: 1, ease: "power1.out",})
+<div id="comment-section">
+
+    <label for="comment">Comment</label>
+    <input type="text" name="comment" v-model='comment' id="comment">
+    
+    <label for="username">Username</label>
+    <input type="text" name="usernameComment" v-model='usernameComment id="usernameComment">
+
+
+    <button @click='fireComments'>Submit</button>
+
+</div>
+
+<!-- <div   v-for="comments in comments">
+
+   <p>{{comments.comment}}</p> 
+
+    <p>{{comments.username}} on {{comments.created_at}}</p>
+
+
+</div>   -->
+
+
+
+</div>
+
 </script>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
+    <script>
+        gsap.from("#logo", 6, { opacity: 0, ease: "power1.out" })
+        gsap.from("#logo", 3, { scale: 0.3 })
+    </script>
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
     <script src="/js/script.js"></script>
 </body>
+
 </html>
