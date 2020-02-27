@@ -113,9 +113,11 @@ input{
     justify-content: center;
     align-items: center;
     opacity: 0.7;
+    
 }
 #modalShow{
-    background-color: white;
+    border: 10px solid black;
+    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);background-image: linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
     position: fixed;
     top: 50%;
     left:50%;
@@ -146,6 +148,24 @@ input{
     display: flex;
     flex-direction:column;
     text-align: center;
+    margin-bottom: 10px;
+}
+#image-data>.uploaded{
+   width:inherit;
+   border-radius: 25%;
+}
+.uploaded{
+    font-size:12px; 
+    border: 0;
+    border-top: 1px solid black;
+    border-style:dotted;
+    width:max-content;
+    padding-top: 10px;
+
+}
+#image-data{
+  border-top: 2px solid #b12a5b;
+  border-bottom: 2px solid #b12a5b;
 }
 #close{
     position: absolute;
@@ -158,4 +178,19 @@ input{
     display: flex;
     justify-content: center;
     margin: 30px 30px;
+}
+#commentsFromUsers{
+    border: 1px solid black;
+    margin: 6px;
+    border-radius: 30px;
+}
+#commentsFromUsers>p{
+    margin-left: 30px;
+}
+#comment-section>input{
+    margin-left: 0px;
+}
+#comment-section>label{
+    margin-left: 50px;
+    margin-right: 10px;
 }

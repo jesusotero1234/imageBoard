@@ -19,10 +19,6 @@ Vue.component('modal', {
         //we can do axios request
         var me = this;
 
-        const id = {
-            id: me.id
-        };
-
         //CSS for the modal
 
         const { modal } = this.$refs;
@@ -33,8 +29,10 @@ Vue.component('modal', {
         gsap.from('#modalShow', 2, {
             scale: 0,
             x: this.offsetleft - 640,
-            y: this.offsettop - 352
+            y: this.offsettop - 640,
+            ease: 'bounce.out'
         });
+        //352 640
 
         // console.log('mounted ready')
         // timeline.to('#modal-mask', 4, { y: 'random(500)'});
@@ -42,9 +40,23 @@ Vue.component('modal', {
         //////
 
         //Send a request to axios to get the info about the image
-        function changeid() {
+
+        this.changeId();
+    },
+    watch: {
+        id: function() {
+            this.changeId();
+        }
+    },
+    methods: {
+        changeId: function() {
+            var me = this;
+            const id2 = {
+                id: me.id
+            };
+           
             axios
-                .post('/singleImage', id)
+                .post('/singleImage', id2)
                 .then(response => {
                     console.log('SingleImage', response);
                     let obj = response.data.response.rows[0];
@@ -56,10 +68,12 @@ Vue.component('modal', {
                     me.imagedata.description = obj.description;
                     me.imagedata.created_at = convertedDate.toUTCString();
                 })
-                .catch(err => console.log(err));
+                .catch(err => {
+                    this.$emit('newid', me.id);
+                    console.log(err)});
 
             axios
-                .post('/comments', id)
+                .post('/comments', id2)
                 .then(function(resp) {
                     console.log('resp from POST /comments', resp);
                     if (resp.data.response.rows.length != 0) {
@@ -67,15 +81,7 @@ Vue.component('modal', {
                     }
                 })
                 .catch(err => console.log(err));
-        }
-        changeid();
-    },
-    watch: {
-        id: function() {
-            changeid();
-        }
-    },
-    methods: {
+        },
         saveComment: function() {
             var me = this;
             const info = {
@@ -153,7 +159,7 @@ new Vue({
             });
 
         addEventListener('hashchange', function() {
-            me.id=location.hash.slice(1)
+            me.id = location.hash.slice(1);
         });
     },
     methods: {
@@ -201,17 +207,16 @@ new Vue({
                 scale: 0
             });
             // this.id = null;
-            var me = this
-            setTimeout(function(){
-                me.id=  history.replaceState(null, null, ' ');
-            },1000)
-           
+            var me = this;
+            setTimeout(function() {
+                me.id = history.replaceState(null, null, ' ');
+            }, 1000);
         },
         elementInfo: function(e) {
-            this.offsetleft = e.target.offsetLeft;
-            this.offsettop = e.target.offsetHeight;
+            this.offsetleft = e.clientX;
+            this.offsettop = e.clientY;
 
-            console.log(e.offsetLeft, 'test', e);
+            // console.log(e.offsetLeft, 'test', e);
         },
         addMoreImages: function() {
             let lastImgId = '';
@@ -246,9 +251,13 @@ new Vue({
                             }
                         });
                     });
-                   
                 })
                 .catch(err => console.log(err));
+        },
+        checkIdIfExist: function() {
+            // console.log('checkifExist', id);
+            this.id = history.replaceState(null, null, ' ')
+
         }
     }
 });

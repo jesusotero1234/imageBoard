@@ -17,9 +17,10 @@
     <div id="main">
 
         <div id="modal-mask" v-if="id" @click='closeModal'  ></div>
+            
             <div id="modalShow" v-if="id" ref="modal">
                 
-                <modal :id='id' :offsetleft='offsetleft' :offsettop='offsettop' @close='closeModal' >
+                <modal :id='id' :offsetleft='offsetleft' :offsettop='offsettop' @close='closeModal' @newid='checkIdIfExist(id)'>
           
                 </modal>     
         <!-- <h1>{{heading}}</h1>
@@ -94,7 +95,7 @@
 
 </div>
 
-<div   v-for="comments in comments" id="comments from users">
+<div   v-for="comments in comments" id="commentsFromUsers">
 
    <p>{{comments.comment}}</p> 
 
