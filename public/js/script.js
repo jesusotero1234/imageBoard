@@ -10,6 +10,8 @@ Vue.component('modal', {
                 description: '',
                 created_at: ''
             },
+            usernameFromComment: '',
+            comment: '',
             comments: []
         };
     },
@@ -20,6 +22,19 @@ Vue.component('modal', {
         const id = {
             id: me.id
         };
+
+
+        //CSS for the modal
+
+        const { modal } = me.$refs;
+        console.log('ref from modal',me.$refs)
+        const timeline = new TimelineLite();
+        gsap.from('#modalShow', 4, { y: 'random(500)'});
+        // console.log('mounted ready')
+        // timeline.to('#modal-mask', 4, { y: 'random(500)'});
+
+        //////
+
         //Send a request to axios to get the info about the image
 
         axios
@@ -41,25 +56,32 @@ Vue.component('modal', {
             .post('/comments', id)
             .then(function(resp) {
                 console.log('resp from POST /comments', resp);
-                if (resp.data.response.rows[0].length != 0) {
-                    me.comments.unshift(resp.data.response.rows[0]);
+                if (resp.data.response.rows.length != 0) {
+                    me.comments= resp.data.response.rows;
                 }
             })
             .catch(err => console.log(err));
     },
     methods: {
-        handleClick: function() {
-            // console.log('clicked in component')
-            //in Emit we can't use something like imageId
-            // must be like imageid or image-id
-            console.log(this);
-            // console.log(this.id)
-            // this.$emit('message', this)
-        },
-        fireComments: function() {
-            console.log('addComments', this);
+        saveComment: function() {
+            var me = this;
+            const info = {
+                id: this.id,
+                usernameFromComment: this.usernameFromComment,
+                comment: this.comment
+            };
+            axios
+                .post('/saveComment', info)
+                .then(function(resp) {
+                    console.log('resp from POST /saveComment', resp);
 
-            this.$emit('addComment', this.id);
+                    me.comments= resp.data.response.rows
+                    
+                })
+                .catch(err => console.log(err));
+        },
+        closeModal: function(){
+            this.$emit('close')
         }
     }
 });
@@ -148,6 +170,10 @@ new Vue({
             console.log('clicked ImageClicked');
             if (this.id === null) {
                 this.id = id;
+                console.log('ref from imageClicked',this.$refs)
+                const {modal}= this.$refs
+                console.log(modal)
+               
             }
         },
         closeModal: function() {

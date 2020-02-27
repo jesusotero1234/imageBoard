@@ -45,7 +45,7 @@ app.get('/images', (req, res) => {
 
 app.post('/upload', uploader.single('file'), s3.upload, (req, res) => {
     //this is going to be hooked up with the database
-    console.log('input', req.body, 'file', req.file);
+    // console.log('input', req.body, 'file', req.file);
 
     if (req.file) {
         const url = s3Url + req.file.filename;
@@ -77,7 +77,6 @@ app.post('/upload', uploader.single('file'), s3.upload, (req, res) => {
 
 app.post('/singleImage', (req, res) => {
     //This will make a request to the database for the singleImage
-    console.log('SingleImage', req.body);
 
     singleImage(req.body.id).then(response => {
         res.json({ response });
@@ -87,15 +86,23 @@ app.post('/singleImage', (req, res) => {
 
 app.post('/comments', (req, res) => {
     //This will make a request to the database for the singleImage
-    console.log('SingleImage', req.body);
+    // console.log('comments', req.body);
 
     comments(req.body.id).then(response => {
+        // console.log('response from comments',response)
         res.json({ response });
     });
+});
 
-    // singleImage(req.body.id).then(response=>{
-    //     res.json({response})
-    // })
+app.post('/saveComment', (req, res) => {
+    //This will make a request to the database for the singleImage
+    // console.log('saveComment', req.body);
+
+    saveComment(req.body.usernameFromComment,req.body.comment,req.body.id).then(response => {
+        comments(req.body.id).then(response => {
+            res.json({ response });
+        });
+    });
     // res.sendStatus(200)
 });
 

@@ -125,11 +125,21 @@ input{
     height: 90%;
     display: flex;
     justify-content: center;
+    overflow: scroll;
 }
 #modal-img{
     width: 450px;
+    height: 300px;
     margin-top: 20px;
+    object-fit: cover;
+    border-radius: 25%;
 /*     height: 40%; */
     
 }
-
+#close{
+    position: absolute;
+        
+    left: 92%;
+    /*! text-align: end; */
+    font-size: large;
+}
