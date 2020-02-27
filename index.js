@@ -5,7 +5,9 @@ const {
     InsertUpload,
     singleImage,
     saveComment,
-    comments
+    comments,
+    getMoreImages,
+    finished
 } = require('./db.js'); //?
 const s3 = require('./s3');
 const { s3Url } = require('./config.json'); //?
@@ -104,6 +106,18 @@ app.post('/saveComment', (req, res) => {
         });
     });
     // res.sendStatus(200)
+});
+
+app.get('/getMoreImages/:id', (req, res) => {
+    console.log('params',req.params.id)
+    //this is going to be hooked up with the database
+    getMoreImages(req.params.id).then(response =>{
+        finished(req.params.id).then(resp1=>{
+            res.json({
+                response,
+                resp1})
+        })
+       });
 });
 
 app.listen(8080, () => console.log('server is running'));

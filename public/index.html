@@ -19,7 +19,7 @@
         <div id="modal-mask" v-if="id" @click='closeModal'  ></div>
             <div id="modalShow" v-if="id" ref="modal">
                 
-                <modal :id='id' @close='closeModal' >
+                <modal :id='id' :offsetleft='offsetleft' :offsettop='offsettop' @close='closeModal' >
           
                 </modal>     
         <!-- <h1>{{heading}}</h1>
@@ -45,21 +45,25 @@
 
             <div id="images-container" ref="box" class="box" v-for="images in images">
 
+                <!-- has changes event -->
 
+                <a :href= "'#' + images.id">
+                    <img v-bind:src="images.url" v-bind:alt="images.description"  @mouseover='elementInfo'>
 
-                <img v-bind:src="images.url" v-bind:alt="images.description" @click='imageClicked(images.id)'>
-
-                <div>
-                    <p>{{images.title}}</p>
-                </div>
-
-
+                    <div>
+                        <p>{{images.title}}</p>
+                     </div>
+   
+                </a>
+   
             </div>
 
         </div>
+<div id="moreImages">
+        <button  @click='addMoreImages' v-if='addButton'>Add more images</button>
+    </div>
 
-
-
+<!-- the div below is the main div -->
     </div>
 
 <script id="first-modal" type="text/x-template">
@@ -68,13 +72,13 @@
 
 <p id="close" @click='closeModal'>[X]</p>
 
-<div>
+<div id="modal-img-container">
     <img id="modal-img" v-bind:src="imagedata.url" v-bind:alt="imagedata.description">
 </div>
-<div >
+<div id="image-data">
   <p>{{imagedata.title}}</p> 
   <p>{{imagedata.description}}</p>
-   <p>uploaded by {{imagedata.username}} on {{imagedata.created_at}}</p>
+   <p class="uploaded">uploaded by {{imagedata.username}} on {{imagedata.created_at}}</p>
 </div>
 
 <div id="comment-section">
@@ -90,11 +94,11 @@
 
 </div>
 
-<div   v-for="comments in comments">
+<div   v-for="comments in comments" id="comments from users">
 
    <p>{{comments.comment}}</p> 
 
-    <p>{{comments.username}} on {{comments.created_at}}</p>
+    <p class="uploaded">{{comments.username}} on {{comments.created_at}}</p>
 
 
 </div>  

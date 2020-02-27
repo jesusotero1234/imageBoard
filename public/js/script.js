@@ -1,6 +1,6 @@
 Vue.component('modal', {
     template: '#first-modal',
-    props: ['id'],
+    props: ['id', 'offsetleft', 'offsettop'],
     data: function() {
         return {
             imagedata: {
@@ -23,44 +23,57 @@ Vue.component('modal', {
             id: me.id
         };
 
-
         //CSS for the modal
 
-        const { modal } = me.$refs;
-        console.log('ref from modal',me.$refs)
-        const timeline = new TimelineLite();
-        gsap.from('#modalShow', 4, { y: 'random(500)'});
+        const { modal } = this.$refs;
+        console.log('ref from modal', this.$refs);
+        // // gsap.from('#modalShow', 2 ,{scale:0.3,y: -1000});
+        console.log(this.offsetleft, this.offsettop);
+        console.log('mounted');
+        gsap.from('#modalShow', 2, {
+            scale: 0,
+            x: this.offsetleft - 640,
+            y: this.offsettop - 352
+        });
+
         // console.log('mounted ready')
         // timeline.to('#modal-mask', 4, { y: 'random(500)'});
 
         //////
 
         //Send a request to axios to get the info about the image
+        function changeid() {
+            axios
+                .post('/singleImage', id)
+                .then(response => {
+                    console.log('SingleImage', response);
+                    let obj = response.data.response.rows[0];
+                    let convertedDate = new Date(obj.created_at);
 
-        axios
-            .post('/singleImage', id)
-            .then(response => {
-                console.log(response);
-                let obj = response.data.response.rows[0];
-                let convertedDate = new Date(obj.created_at);
+                    me.imagedata.url = obj.url;
+                    me.imagedata.username = obj.username;
+                    me.imagedata.title = obj.title;
+                    me.imagedata.description = obj.description;
+                    me.imagedata.created_at = convertedDate.toUTCString();
+                })
+                .catch(err => console.log(err));
 
-                me.imagedata.url = obj.url;
-                me.imagedata.username = obj.username;
-                me.imagedata.title = obj.title;
-                me.imagedata.description = obj.description;
-                me.imagedata.created_at = convertedDate.toUTCString();
-            })
-            .catch(err => console.log(err));
-
-        axios
-            .post('/comments', id)
-            .then(function(resp) {
-                console.log('resp from POST /comments', resp);
-                if (resp.data.response.rows.length != 0) {
-                    me.comments= resp.data.response.rows;
-                }
-            })
-            .catch(err => console.log(err));
+            axios
+                .post('/comments', id)
+                .then(function(resp) {
+                    console.log('resp from POST /comments', resp);
+                    if (resp.data.response.rows.length != 0) {
+                        me.comments = resp.data.response.rows;
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+        changeid();
+    },
+    watch: {
+        id: function() {
+            changeid();
+        }
     },
     methods: {
         saveComment: function() {
@@ -75,13 +88,12 @@ Vue.component('modal', {
                 .then(function(resp) {
                     console.log('resp from POST /saveComment', resp);
 
-                    me.comments= resp.data.response.rows
-                    
+                    me.comments = resp.data.response.rows;
                 })
                 .catch(err => console.log(err));
         },
-        closeModal: function(){
-            this.$emit('close')
+        closeModal: function() {
+            this.$emit('close');
         }
     }
 });
@@ -94,7 +106,10 @@ new Vue({
         description: '',
         username: '',
         file: null,
-        id: null,
+        id: location.hash.slice(1),
+        addButton: null,
+        offsetleft: null,
+        offsettop: null,
         comments: []
     }, //data ends
     mounted: function() {
@@ -107,7 +122,10 @@ new Vue({
             .get('/images')
             .then(function(response) {
                 console.log(response.data.rows);
-                me.images = response.data.rows;
+                if (response.data.rows) {
+                    me.images = response.data.rows;
+                    me.addButton = true;
+                }
             })
             .catch(err => console.log(err))
             .then(() => {
@@ -133,6 +151,10 @@ new Vue({
                 });
                 // timeline.to(box, 5, { x: 0, scale: 1 })
             });
+
+        addEventListener('hashchange', function() {
+            me.id=location.hash.slice(1)
+        });
     },
     methods: {
         handleClick: function(e) {
@@ -168,25 +190,65 @@ new Vue({
         },
         imageClicked: function(id) {
             console.log('clicked ImageClicked');
-            if (this.id === null) {
+            if (!this.id) {
                 this.id = id;
-                console.log('ref from imageClicked',this.$refs)
-                const {modal}= this.$refs
-                console.log(modal)
-               
+                console.log('imagedclicked', this);
             }
         },
         closeModal: function() {
             console.log('clicked CloseModal');
-            this.id = null;
-        }
-        // addComments: function(idVal){
-        //     // let id = {
-        //     //     id: idVal,
-        //     //     username: this.usernameComment,
-        //     //     comment: this.comment
-        //     // };
+            gsap.to('#modalShow', 1, {
+                scale: 0
+            });
+            // this.id = null;
+            var me = this
+            setTimeout(function(){
+                me.id=  history.replaceState(null, null, ' ');
+            },1000)
+           
+        },
+        elementInfo: function(e) {
+            this.offsetleft = e.target.offsetLeft;
+            this.offsettop = e.target.offsetHeight;
 
-        // }
+            console.log(e.offsetLeft, 'test', e);
+        },
+        addMoreImages: function() {
+            let lastImgId = '';
+            this.images.forEach(element => {
+                if (lastImgId.length == 0) {
+                    lastImgId = element.id;
+                } else if (element.id < lastImgId) {
+                    lastImgId = element.id;
+                }
+            });
+            var me = this;
+            axios
+                .get(`/getMoreImages/${lastImgId}`)
+                .then(resp => {
+                    // console.log('resp form addMoreImages', resp);
+                    //data from addMoreImages is resp.data.response
+                    //data from finished (to check the last one) is resp.data.resp
+
+                    //push the new images to the images array
+                    resp.data.response.forEach(newImg => {
+                        me.images.push(newImg);
+                        // gsap.from(newImg, 3, {
+                        //     x: 'random(1500,1000)',
+                        //     scale: 0.3,
+                        //     stagger: 0.25
+                        //     // ease: 'bounce.out'
+                        // });
+                        resp.data.resp1.forEach(checkId => {
+                            // console.group(el)
+                            if (checkId.lowestId == newImg.id) {
+                                me.addButton = null;
+                            }
+                        });
+                    });
+                   
+                })
+                .catch(err => console.log(err));
+        }
     }
 });

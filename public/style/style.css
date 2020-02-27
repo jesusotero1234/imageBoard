@@ -14,7 +14,7 @@ body {
     margin: 40px 40px;
 }
 
-#images-container>img {
+#images-container>a>img {
     width: 250px;
     height: 250px;
     object-fit: cover;
@@ -43,13 +43,13 @@ body {
     border-radius: 10%;
 }
 
-#images-container>div{
+#images-container>a>div{
     border-top: 2px solid #b12a5b;
     width: 100%;
    margin-top:5px;
    border-radius: 25%; 
 }
-#images-container>div>p{
+#images-container>a>div>p{
     font-family: 'Trade Winds' ;
 }
 
@@ -126,9 +126,15 @@ input{
     display: flex;
     justify-content: center;
     overflow: scroll;
+    border-radius: 15%;
+}
+
+#modal-img-container{
+    display: flex;
+    justify-content: center;
 }
 #modal-img{
-    width: 450px;
+    width: 300px;
     height: 300px;
     margin-top: 20px;
     object-fit: cover;
@@ -136,10 +142,20 @@ input{
 /*     height: 40%; */
     
 }
+#image-data{
+    display: flex;
+    flex-direction:column;
+    text-align: center;
+}
 #close{
     position: absolute;
         
-    left: 92%;
+    left: 82%;
     /*! text-align: end; */
     font-size: large;
+}
+#moreImages{
+    display: flex;
+    justify-content: center;
+    margin: 30px 30px;
 }
