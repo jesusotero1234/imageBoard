@@ -11,6 +11,7 @@ const {
 } = require('./db.js'); //?
 const s3 = require('./s3');
 const { s3Url } = require('./config.json'); //?
+const moment = require('moment')
 
 app.use(express.static('public'));
 
@@ -92,7 +93,23 @@ app.post('/comments', (req, res) => {
 
     comments(req.body.id).then(response => {
         // console.log('response from comments',response)
-        res.json({ response });
+        let obj = []
+        //Converting dates with moment
+        response.rows.forEach(({comment,created_at,id,image_id,username}) => {
+           
+          created_at=   moment(created_at, "YYYYMMDD").fromNow();
+            
+            obj.push({
+                comment,
+                created_at,
+                id,
+                image_id,
+                username
+            })
+           
+        });
+        console.log("check new obj",obj)
+        res.json({ obj });
     });
 });
 
@@ -109,7 +126,7 @@ app.post('/saveComment', (req, res) => {
 });
 
 app.get('/getMoreImages/:id', (req, res) => {
-    console.log('params',req.params.id)
+    // console.log('params',req.params.id)
     //this is going to be hooked up with the database
     getMoreImages(req.params.id).then(response =>{
         finished(req.params.id).then(resp1=>{

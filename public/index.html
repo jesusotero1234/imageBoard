@@ -30,10 +30,9 @@
      
 
         <form ref="form">
-
+            <input v-model='username' type="text" name="username" placeholder="username" class="form">
             <input v-model='title' type="text" name="title" placeholder="text" class="form">
             <input v-model='description' type="text" name="description" placeholder="description" class="form">
-            <input v-model='username' type="text" name="username" placeholder="username" class="form">
             <input type="file" @change='handleChange' name="file" accept="image/*" class="inputfile" id="file" >
             <label for="file" class="form">Choose a file</label>
             <button @click='handleClick' class="form">Submit</button>
@@ -71,39 +70,42 @@
 
     <div>
 
-<p id="close" @click='closeModal'>[X]</p>
+<!-- <p id="close" @click='closeModal'>[X]</p> -->
+<img src="./img/cruzar.svg" id="close" @click='closeModal'>
 
 <div id="modal-img-container">
     <img id="modal-img" v-bind:src="imagedata.url" v-bind:alt="imagedata.description">
 </div>
 <div id="image-data">
-  <p>{{imagedata.title}}</p> 
-  <p>{{imagedata.description}}</p>
+  <h1>{{imagedata.title}}</h1> 
+  <h2>{{imagedata.description}}</h2>
    <p class="uploaded">uploaded by {{imagedata.username}} on {{imagedata.created_at}}</p>
 </div>
 
-<div id="comment-section">
+<div id="comment-section" class="comment-total">
 
-    <label for="comment">Comment</label>
-    <input type="text" name="comment" v-model='comment' id="comment">
-    
+        
     <label for="username">Username</label>
     <input type="text" name="usernameFromComment" v-model='usernameFromComment' id="usernameFromComment">
 
+    <label for="comment">Comment</label>
+    <input type="text" name="comment" v-model='comment' id="comment">
 
     <button @click='saveComment'>Submit</button>
 
-</div>
+    <p v-if='error' id="error-comments">{{error}}</p>
 
-<div   v-for="comments in comments" id="commentsFromUsers">
+    <h1>Comment Section</h1>
 
-   <p>{{comments.comment}}</p> 
+<div   v-for="comments in comments" id="commentsFromUsers" class="comment comment-transition">
 
-    <p class="uploaded">{{comments.username}} on {{comments.created_at}}</p>
+   <p class='comment-transition'>{{comments.comment}}</p> 
+
+    <p class="uploaded comment-transition">{{comments.username}} on {{comments.created_at}}</p>
 
 
 </div>  
-
+</div>
 
 
 </div>
@@ -111,7 +113,7 @@
 </script>
 
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.0/gsap.min.js"></script>
     <script>
         gsap.from("#logo", 6, { opacity: 0, ease: "power1.out" })

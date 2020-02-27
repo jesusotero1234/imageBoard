@@ -1,3 +1,5 @@
+
+
 Vue.component('modal', {
     template: '#first-modal',
     props: ['id', 'offsetleft', 'offsettop'],
@@ -8,20 +10,21 @@ Vue.component('modal', {
                 username: '',
                 title: '',
                 description: '',
-                created_at: ''
-            },
+                created_at: '',
+            },  
             usernameFromComment: '',
             comment: '',
+            error: '',
             comments: []
         };
     },
     mounted: function() {
         //we can do axios request
-        var me = this;
+    
 
         //CSS for the modal
 
-        const { modal } = this.$refs;
+     
         console.log('ref from modal', this.$refs);
         // // gsap.from('#modalShow', 2 ,{scale:0.3,y: -1000});
         console.log(this.offsetleft, this.offsettop);
@@ -60,13 +63,13 @@ Vue.component('modal', {
                 .then(response => {
                     console.log('SingleImage', response);
                     let obj = response.data.response.rows[0];
-                    let convertedDate = new Date(obj.created_at);
+                    let convertedDate = moment(obj.created_at, "YYYYMMDD").fromNow();
 
                     me.imagedata.url = obj.url;
                     me.imagedata.username = obj.username;
                     me.imagedata.title = obj.title;
                     me.imagedata.description = obj.description;
-                    me.imagedata.created_at = convertedDate.toUTCString();
+                    me.imagedata.created_at = convertedDate;
                 })
                 .catch(err => {
                     this.$emit('newid', me.id);
@@ -76,14 +79,22 @@ Vue.component('modal', {
                 .post('/comments', id2)
                 .then(function(resp) {
                     console.log('resp from POST /comments', resp);
-                    if (resp.data.response.rows.length != 0) {
-                        me.comments = resp.data.response.rows;
+                    if (resp.data.obj != 0) {
+                        me.comments = resp.data.obj;
                     }
                 })
                 .catch(err => console.log(err));
         },
         saveComment: function() {
             var me = this;
+
+
+            if(this.usernameFromComment.trim().length == 0 ||this.comment.trim().length ==0){
+                this.error='To post a comment fill username and comment'
+                return
+            }
+            this.error = ''
+            
             const info = {
                 id: this.id,
                 usernameFromComment: this.usernameFromComment,
@@ -95,6 +106,16 @@ Vue.component('modal', {
                     console.log('resp from POST /saveComment', resp);
 
                     me.comments = resp.data.response.rows;
+
+
+                    //CSS transition when adding comment
+
+                    gsap.from('.comment-transition', 1, { y: 'random(40,60)', stagger: 0.10 });
+
+                    ////
+
+                    me.usernameFromComment = ''
+                    me.comment = ''
                 })
                 .catch(err => console.log(err));
         },

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Trade+Winds&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap');
 
 body {
     background-image: linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%);
@@ -50,7 +51,8 @@ body {
    border-radius: 25%; 
 }
 #images-container>a>div>p{
-    font-family: 'Trade Winds' ;
+/*     font-family: 'Trade Winds' ; */
+    font-family: 'Roboto Mono' ;
 }
 
 form{
@@ -116,9 +118,8 @@ input{
     
 }
 #modalShow{
-    border: 10px solid black;
-    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);background-image: linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-    position: fixed;
+    border: 10px solid #f5576c;
+background-image: linear-gradient(to top, #f77062 0%, #fe5196 100%);    position: fixed;
     top: 50%;
     left:50%;
     transform: translate(-50%, -50%);
@@ -145,34 +146,42 @@ input{
     
 }
 #image-data{
-    display: flex;
     flex-direction:column;
     text-align: center;
     margin-bottom: 10px;
+      border-top: 2px solid #b12a5b;
+  border-bottom: 2px solid #b12a5b;
 }
 #image-data>.uploaded{
    width:inherit;
    border-radius: 25%;
+    
+}
+#image-data>h1{
+    border: 0;
+    border-bottom: 2px solid #b12a5b;
+    border-radius: 13%;
+    padding-bottom: 20px;
+    border-style: dotted;
 }
 .uploaded{
     font-size:12px; 
     border: 0;
-    border-top: 1px solid black;
+    border-top: 2px solid #b12a5b;
     border-style:dotted;
     width:max-content;
     padding-top: 10px;
+    
 
-}
-#image-data{
-  border-top: 2px solid #b12a5b;
-  border-bottom: 2px solid #b12a5b;
 }
 #close{
     position: absolute;
-        
-    left: 82%;
+    width: 40px;
+    top: 5%;
+    left: 90%;
     /*! text-align: end; */
     font-size: large;
+    cursor: pointer;
 }
 #moreImages{
     display: flex;
@@ -180,9 +189,12 @@ input{
     margin: 30px 30px;
 }
 #commentsFromUsers{
-    border: 1px solid black;
+    border: 1px solid #b12a5b;
     margin: 6px;
     border-radius: 30px;
+}
+#commentsFromUsers:hover{
+filter: brightness(0.3);
 }
 #commentsFromUsers>p{
     margin-left: 30px;
@@ -193,4 +205,27 @@ input{
 #comment-section>label{
     margin-left: 50px;
     margin-right: 10px;
+}
+p, label,h1,h2, input{
+    font-family: 'Roboto Mono' ;
+    color: white;
+    letter-spacing: 3px;
+    
+}
+/* input{
+    font-size: large;
+} */
+a{
+    text-decoration: none;
+}
+.comment-total{
+    border: 1px solid #b12a5b;
+    border-style: dashed;
+    border-radius: 3%;
+    padding: 10px;
+    margin-top: 20px;
+}
+#error-comments{
+color: yellow;
+text-align: center;
 }
