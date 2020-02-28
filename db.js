@@ -62,6 +62,8 @@ exports.getMoreImages = lastId => db.query(
     ({rows}) => rows
 );
 
+
+//Subquery to compare if we reach the end
 exports.finished = (id)=>db.query(
     `SELECT url, title, id, (
     SELECT id FROM images
@@ -72,6 +74,11 @@ exports.finished = (id)=>db.query(
     LIMIT 4`,[id]
 ).then(({rows})=>rows)
 
-//Subquery to compare if we reach the end
+//Check all the images id
+exports.allImages= function() {
+    return db.query(
+        `SELECT id FROM images`
+    ).then(({rows})=> rows)
+}
 
 

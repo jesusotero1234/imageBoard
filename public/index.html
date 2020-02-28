@@ -11,71 +11,90 @@
 
     <div id="logo-container" ref="logo">
         <img src="./img/logo.png" alt="logo" id="logo">
-
-
+        
+        
     </div>
     <div id="main">
+        
+
+
+        <img src="./img/left.png" alt="like" class="arrow-left" v-if="id" @click='arrowClick'>
+        <img src="./img/right.svg" alt="like" class="right" v-if="id" @click='arrowClick'>
 
         <div id="modal-mask" v-if="id" @click='closeModal'  ></div>
-            
-            <div id="modalShow" v-if="id" ref="modal">
-                
-                <modal :id='id' :offsetleft='offsetleft' :offsettop='offsettop' @close='closeModal' @newid='checkIdIfExist(id)'>
-          
-                </modal>     
-        <!-- <h1>{{heading}}</h1>
-        <p  @click='handleClick'>i'm a p tag in the component</p> -->
         
-        </div>
-     
-
-        <form ref="form">
-            <input v-model='username' type="text" name="username" placeholder="username" class="form">
-            <input v-model='title' type="text" name="title" placeholder="text" class="form">
-            <input v-model='description' type="text" name="description" placeholder="description" class="form">
-            <input type="file" @change='handleChange' name="file" accept="image/*" class="inputfile" id="file" >
-            <label for="file" class="form">Choose a file</label>
-            <button @click='handleClick' class="form">Submit</button>
-
-
-        </form>
-
-
-        <div id="grid-container">
-
-            <div id="images-container" ref="box" class="box" v-for="images in images">
-
-                <!-- has changes event -->
-
-                <a :href= "'#' + images.id">
-                    <img v-bind:src="images.url" v-bind:alt="images.description"  @mouseover='elementInfo'>
-
-                    <div>
-                        <p>{{images.title}}</p>
-                     </div>
-   
-                </a>
-   
+        <div id="modalShow" v-if="id" ref="modal">
+            
+            <modal :id='id' :offsetleft='offsetleft' :offsettop='offsettop' @close='closeModal' @newid='checkIdIfExist(id)'>
+                
+            </modal>     
+            <!-- <h1>{{heading}}</h1>
+                <p  @click='handleClick'>i'm a p tag in the component</p> -->
+                
             </div>
-
+            
+            
+            <form ref="form">
+                <input v-model='username' type="text" name="username" placeholder="username" class="form">
+                <input v-model='title' type="text" name="title" placeholder="text" class="form">
+                <input v-model='description' type="text" name="description" placeholder="description" class="form">
+                <input type="file" @change='handleChange' name="file" accept="image/*" class="inputfile" id="file" >
+                <label for="file" class="form">Choose a file</label>
+                <button @click='handleClick' class="form">Submit</button>
+                
+                
+            </form>
+            
+            <p v-if='error' id="error-comments">{{error}}</p>
+            
+            <div id="grid-container">
+                
+                <div id="images-container" ref="box" class="box" v-for="images in images">
+                    
+                    <!-- has changes event -->
+                    
+                    <a :href= "'#' + images.id">
+                        <img v-bind:src="images.url" v-bind:alt="images.description"  @mouseover='elementInfo'>
+                        
+                        <div>
+                            <p>{{images.title}}</p>
+                        </div>
+                        
+                    </a>
+                    
+                </div>
+                
+            </div>
+            <div id="moreImages">
+                <button  @click='addMoreImages' v-if='addButton'>Add more images</button>
+            </div>
+            
+            <!-- the div below is the main div -->
         </div>
-<div id="moreImages">
-        <button  @click='addMoreImages' v-if='addButton'>Add more images</button>
-    </div>
+        
+        <script id="first-modal" type="text/x-template">
+            
+            <div>
+                
+                <img src="./img/cruzar.svg" id="close" @click='closeModal'>
+                
+                <div id="modal-img-container">
 
-<!-- the div below is the main div -->
-    </div>
-
-<script id="first-modal" type="text/x-template">
-
-    <div>
-
-<!-- <p id="close" @click='closeModal'>[X]</p> -->
-<img src="./img/cruzar.svg" id="close" @click='closeModal'>
-
-<div id="modal-img-container">
-    <img id="modal-img" v-bind:src="imagedata.url" v-bind:alt="imagedata.description">
-</div>
+                    <div class="dislike-container" >
+                        <img src="./img/dislike.png" alt="like" id="dislike-button" @click='likeButtons'>
+                        <p><b>{{dislike}}</b></p>
+                    </div>
+                    
+                    <img id="modal-img" v-bind:src="imagedata.url" v-bind:alt="imagedata.description">
+                    
+                    <div class="like-container"  >
+                        <img src="./img/like.svg" alt="like" id="like-button" @click='likeButtons'>
+                        <p><b>{{like}}</b></p>
+                    </div>
+                    
+                 
+                    
+                </div>
 <div id="image-data">
   <h1>{{imagedata.title}}</h1> 
   <h2>{{imagedata.description}}</h2>
@@ -101,7 +120,7 @@
 
    <p class='comment-transition'>{{comments.comment}}</p> 
 
-    <p class="uploaded comment-transition">{{comments.username}} on {{comments.created_at}}</p>
+    <p class="uploaded comment-transition">uploaded by <b>{{comments.username}}</b> {{comments.created_at}}</p>
 
 
 </div>  

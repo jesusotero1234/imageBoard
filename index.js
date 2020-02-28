@@ -7,11 +7,12 @@ const {
     saveComment,
     comments,
     getMoreImages,
-    finished
+    finished,
+    allImages
 } = require('./db.js'); //?
 const s3 = require('./s3');
 const { s3Url } = require('./config.json'); //?
-const moment = require('moment')
+const moment = require('moment');
 
 app.use(express.static('public'));
 
@@ -93,22 +94,22 @@ app.post('/comments', (req, res) => {
 
     comments(req.body.id).then(response => {
         // console.log('response from comments',response)
-        let obj = []
+        let obj = [];
         //Converting dates with moment
-        response.rows.forEach(({comment,created_at,id,image_id,username}) => {
-           
-          created_at=   moment(created_at, "YYYYMMDD").fromNow();
-            
-            obj.push({
-                comment,
-                created_at,
-                id,
-                image_id,
-                username
-            })
-           
-        });
-        console.log("check new obj",obj)
+        response.rows.forEach(
+            ({ comment, created_at, id, image_id, username }) => {
+                created_at = moment(created_at, 'YYYYMMDD').fromNow();
+
+                obj.push({
+                    comment,
+                    created_at,
+                    id,
+                    image_id,
+                    username
+                });
+            }
+        );
+        console.log('check new obj', obj);
         res.json({ obj });
     });
 });
@@ -117,24 +118,33 @@ app.post('/saveComment', (req, res) => {
     //This will make a request to the database for the singleImage
     // console.log('saveComment', req.body);
 
-    saveComment(req.body.usernameFromComment,req.body.comment,req.body.id).then(response => {
+    saveComment(
+        req.body.usernameFromComment,
+        req.body.comment,
+        req.body.id
+    ).then(() => {
         comments(req.body.id).then(response => {
             res.json({ response });
         });
     });
-    // res.sendStatus(200)
 });
 
 app.get('/getMoreImages/:id', (req, res) => {
     // console.log('params',req.params.id)
     //this is going to be hooked up with the database
-    getMoreImages(req.params.id).then(response =>{
-        finished(req.params.id).then(resp1=>{
+    getMoreImages(req.params.id).then(response => {
+        finished(req.params.id).then(resp1 => {
             res.json({
                 response,
-                resp1})
-        })
-       });
+                resp1
+            });
+        });
+    });
+});
+
+app.get('/imagesId', (req, res) => {
+    //this is going to be hooked up with the database
+    allImages().then(response => res.json(response));
 });
 
 app.listen(8080, () => console.log('server is running'));

@@ -31,6 +31,9 @@
         "axios": false,
         "Vue": false,
         "expect": false,
-        "test": false
+        "test": false,
+        "gsap":false,
+        "moment":false,
+        "TimelineLite":false
     }
 }
