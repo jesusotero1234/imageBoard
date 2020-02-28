@@ -12,9 +12,9 @@ Vue.component('modal', {
             },
             usernameFromComment: '',
             comment: '',
-            error: '', 
-            like:0,
-            dislike:0,
+            error: '',
+            like: 0,
+            dislike: 0,
             comments: []
         };
     },
@@ -49,10 +49,12 @@ Vue.component('modal', {
         //////
 
         this.changeId();
+        this.likeDataCheck()
     },
     watch: {
         id: function() {
             this.changeId();
+            this.likeDataCheck()
         }
     },
     methods: {
@@ -134,19 +136,118 @@ Vue.component('modal', {
         closeModal: function() {
             this.$emit('close');
         },
-        likeButtons: function(e){
+        likeButtons: function(e) {
+            e.stopPropagation();
+            console.log('idWhenClicked', this.id);
 
-            
-            if (e.target.attributes[2].nodeValue == 'like-button') {
+            var me = this;
+            axios.get(`/seeLikes/${this.id}`).then(res => {
+                console.log('Response from seeLikes', res);
 
-                this.like++
+                let userUpdateLiked = {
+                    liked: 'yes',
+                    disliked: null,
+                    imageID: me.id
+                };
 
-            } else if(e.target.attributes[2].nodeValue == 'dislike-button') {
-                
-                this.dislike++
-            }
+                let userUpdatedisLiked = {
+                    liked: null,
+                    disliked: 'yes',
+                    imageID: me.id
+                };
 
+                let userData = res.data.response[0];
 
+                console.log(
+                    'liked',
+                    userData.liked,
+                    'dislike',
+                    userData.dislike
+                );
+                if (e.target.attributes[2].nodeValue == 'like-button') {
+                    if (userData.liked == null && userData.dislike != null) {
+                        me.like++;
+                        console.log('entered here');
+                        axios
+                            .post('/updateLikeFromUser', userUpdateLiked)
+                            .then(() => {});
+                        if (me.dislike != 0) {
+                            me.dislike--;
+                        }
+                        return;
+                    } else if (
+                        userData.liked == null &&
+                        userData.dislike == null
+                    ) {
+                        me.like++;
+                        axios
+                            .post('/updateLikeFromUser', userUpdateLiked)
+                            .then(() => {});
+                        return;
+                    } else if (
+                        userData.dislike == null &&
+                        userData.liked != null
+                    ) {
+                        console.log('entered last part the likes button');
+                      return
+                    }
+                }
+
+                if (e.target.attributes[2].nodeValue == 'dislike-button') {
+                    if (userData.dislike == null && userData.like !== null) {
+                        me.dislike++;
+                        console.log('check like', me.like);
+                        if(me.like !=0){
+                            me.like--
+                        }
+                        axios
+                            .post('/updateLikeFromUser', userUpdatedisLiked)
+                            .then(() => {});
+
+                        return;
+                    } else if (
+                        userData.dislike == null &&
+                        userData.liked == null
+                    ) {
+                        me.dislike++;
+                        axios
+                            .post('/updateLikeFromUser', userUpdatedisLiked)
+                            .then(() => {});
+                        return;
+                    } else if (
+                        userData.dislike == null &&
+                        userData.liked != null
+                    ) {
+                      return
+                    }
+                }
+            });
+        },
+        likeDataCheck: function() {
+            var me = this;
+            axios.get(`/likesTable/${this.id}`).then(res => {
+                console.log('modalLikesTable', res);
+
+                if (res.data.length == 0) {
+                    me.like = 0;
+                    me.dislike = 0;
+                }
+                if (res.data.length > 0) {
+                    let likeCheck = 0;
+                    let dislikeCheck = 0;
+                    res.data.forEach(element => {
+                        if (element.liked == 'yes') {
+                            likeCheck++;
+                        }
+                        if (element.dislike == 'yes') {
+                            dislikeCheck++;
+                        }
+                    });
+
+                    me.like = likeCheck;
+                    me.dislike = dislikeCheck;
+                }
+            });
         }
     }
 });
@@ -311,37 +412,47 @@ new Vue({
         arrowClick: function(e) {
             console.log(e.target.attributes[2]);
             var me = this;
-            axios.get(`/imagesId`).then(response => {
-                let lastNumber = response.data.sort(function(a, b) {
-                    return b - a;
-                });
+            axios
+                .get(`/imagesId`)
+                .then(response => {
+                    let lastNumber = response.data.sort(function(a, b) {
+                        return b - a;
+                    });
 
-                //check the id in the array
+                    //check the id in the array
 
-                let newId = '';
-                lastNumber.forEach((element, index) => {
-                    if (element.id == me.id) {
-                        newId = index;
-                        return;
+                    let newId = '';
+                    lastNumber.forEach((element, index) => {
+                        if (element.id == me.id) {
+                            newId = index;
+                            return;
+                        }
+                    });
+                    console.log(
+                        'condition',
+                        newId + 1,
+                        me.id,
+                        lastNumber[0].id,
+                        lastNumber.length - 1
+                    );
+
+                    let finalId = '';
+                    if (e.target.attributes[2].nodeValue == 'right') {
+                        finalId = lastNumber[newId + 1].id;
+                    } else if (
+                        e.target.attributes[2].nodeValue == 'arrow-left'
+                    ) {
+                        finalId = lastNumber[newId - 1].id;
                     }
+
+                    me.id = finalId;
+                    location.hash = me.id;
+                    console.log(response);
+                })
+                .catch(() => {
+                    me.closeModal();
+                    //  return;
                 });
-                console.log('condition',newId+1, me.id, lastNumber[0].id,lastNumber.length-1) ;
-        
-                let finalId = '';
-                if (e.target.attributes[2].nodeValue == 'right') {
-                    finalId = lastNumber[newId + 1].id;
-                } else if (e.target.attributes[2].nodeValue == 'arrow-left') {
-                    finalId = lastNumber[newId - 1].id;
-                }
-
-                me.id = finalId;
-                location.hash = me.id;
-                console.log(response);
-
-            }).catch(()=>{
-                me.closeModal();
-                //  return; 
-            });
         }
     }
 });

@@ -8,11 +8,17 @@ const {
     comments,
     getMoreImages,
     finished,
-    allImages
+    allImages,
+    imageUrlData,
+    saveLikes,
+    likesTable,
+    likesTableforModal
 } = require('./db.js'); //?
 const s3 = require('./s3');
 const { s3Url } = require('./config.json'); //?
 const moment = require('moment');
+const cookieSession = require('cookie-session');
+const { v4 } = require('uuid');
 
 app.use(express.static('public'));
 
@@ -39,10 +45,37 @@ const uploader = multer({
     }
 });
 
+app.use(
+    cookieSession({
+        secret: 'super-secret-password',
+        maxAge: 1000 * 60 * 60 * 24 * 14 //2 Weeks it will last the cookie, when it's over expire
+    })
+);
+
+app.use(function(req, res, next) {
+    if (!req.session.id) {
+        req.session.id = v4();
+        next();
+    } else {
+        next();
+    }
+});
+
+app.use(
+    express.urlencoded({
+        extended: false
+    })
+);
+
 app.use(express.json());
 //any routes are just for info/data
 
 app.get('/images', (req, res) => {
+    //Create Cookie session and saves the Id
+
+    ///Save the req.session in the database
+    // saveUserID(req.session.id).then(()=>{}).catch(err=>console.log(err))
+
     //this is going to be hooked up with the database
     imagesData().then(response => res.json(response));
 });
@@ -145,6 +178,51 @@ app.get('/getMoreImages/:id', (req, res) => {
 app.get('/imagesId', (req, res) => {
     //this is going to be hooked up with the database
     allImages().then(response => res.json(response));
+});
+
+app.get('/seeLikes/:id', (req, res) => {
+    // console.log("req.params",req.params)
+    console.log(req.session.id, req.params.id);
+    //this is going to be hooked up with the database
+    likesTable(req.session.id, req.params.id).then(response => {
+        if (response.length == 0) {
+            imageUrlData(req.session.id, req.params.id)
+                .then(response => {
+                    likesTable(req.session.id, req.params.id).then(response =>
+                        res.json({ response })
+                    );
+                })
+                .catch(err => {
+                    console.log(err);
+                    likesTable(req.session.id, req.params.id).then(response =>
+                        res.json({ response })
+                    );
+                });
+        } else {
+            likesTable(req.session.id, req.params.id).then(response =>
+                res.json({ response })
+            );
+        }
+    });
+});
+
+app.post('/updateLikeFromUser', (req, res) => {
+    console.log('updateLike', req.body, 'hello');
+
+    saveLikes(
+        req.body.liked,
+        req.body.disliked,
+        req.session.id,
+        req.body.imageID
+    )
+        .then(() => {})
+        .catch(err => console.log(err));
+    // seeLikes(req.session.id).then(response => res.json(response));
+});
+
+app.get('/likesTable/:id', (req, res) => {
+    //this is going to be hooked up with the database
+    likesTableforModal(req.params.id).then(response => res.json(response));
 });
 
 app.listen(8080, () => console.log('server is running'));

@@ -81,4 +81,50 @@ exports.allImages= function() {
     ).then(({rows})=> rows)
 }
 
+//insert UserId for likes
+exports.saveUserID = function(userId) {
+    return db.query(
+        `INSERT INTO likes (userId)
+        VALUES ($1)  `,
+        [userId]
+    )
+}
 
+//save seeLikes
+exports.imageUrlData = function(userId,imageID) {
+    return db.query(
+        `INSERT INTO likes (userId,imageId)
+        VALUES ($1,$2)  `,
+        [userId,imageID]
+    )
+}
+
+// info of the likes table
+exports.likesTable = function(userId,imageID) {
+    return db.query(
+        `SELECT * FROM likes
+        WHERE userID=$1 AND imageID =$2
+        `,
+        [userId,imageID]
+    ).then(({rows})=> rows)
+}
+
+//save Likes/Dislikes
+exports.saveLikes= function(liked,dislike,userId,imageID) {
+    return db.query(
+        `UPDATE likes 
+        SET liked=$1, dislike=$2
+        WHERE userID =$3 AND imageID=$4   `,
+        [liked,dislike,userId,imageID]
+    )
+}
+
+//All likes from tables
+exports.likesTableforModal = function(imageID) {
+    return db.query(
+        `SELECT liked,dislike FROM likes
+        WHERE imageID =$1
+        `,
+        [imageID]
+    ).then(({rows})=> rows)
+}
