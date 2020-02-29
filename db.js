@@ -10,7 +10,7 @@ exports.imagesData = function() {
     return db.query(
         `SELECT * FROM images
         ORDER BY id DESC
-        LIMIT 6`
+        LIMIT 3`
     )
 }
 
@@ -56,7 +56,7 @@ exports.getMoreImages = lastId => db.query(
     `SELECT * FROM images
     WHERE id < $1
     ORDER BY id DESC
-    LIMIT 4 `,
+    LIMIT 3`,
     [lastId]
 ).then(
     ({rows}) => rows
@@ -71,7 +71,7 @@ exports.finished = (id)=>db.query(
     LIMIT 1) AS "lowestId" FROM images
     WHERE id < $1
     ORDER BY id DESC
-    LIMIT 4`,[id]
+    LIMIT 3`,[id]
 ).then(({rows})=>rows)
 
 //Check all the images id

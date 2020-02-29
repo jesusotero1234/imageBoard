@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const { promisify } = require('util');
 const {
     imagesData,
     InsertUpload,

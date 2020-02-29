@@ -337,9 +337,11 @@ new Vue({
         urls: function() {
             this.urls.forEach(element => {
                 console.log('checkArrayUrl', this.urls);
-                let test = document.querySelector(`img[src='${element}']`);
-                console.log(test);
-                gsap.from(test, 1, { x: -1000 });
+                
+                setTimeout(function(){
+                    let test = document.querySelector(`img[src='${element}']`);
+                    console.log(test);
+                    gsap.from(test, 1, { x: -1000 });},10)
             });
         }
     },
@@ -532,7 +534,10 @@ new Vue({
                 .get(`/getMoreImages/${lastImgId}`)
                 .then(resp => {
                     console.log('addMoreImages', resp);
-                    //push the new images to the images array
+                    
+                    //this  makes a refresh to the array
+                    me.urls= []
+
                     resp.data.response.forEach(newImg => {
                         me.images.push(newImg);
                         me.urls.push(newImg.url);
@@ -555,15 +560,19 @@ new Vue({
         arrowClick: function(e) {
             console.log(e.target.attributes[2]);
             var me = this;
+            var tl = new TimelineLite();
+           
+
+            // setTimeout(function)
             axios
                 .get(`/imagesId`)
                 .then(response => {
                     let lastNumber = response.data.sort(function(a, b) {
                         return b - a;
                     });
-
+                   
                     //check the id in the array
-
+                    // tl.from('#modalShow', 1, {x:-1000})
                     let newId = '';
                     lastNumber.forEach((element, index) => {
                         if (element.id == me.id) {
@@ -582,14 +591,17 @@ new Vue({
                     let finalId = '';
                     if (e.target.attributes[2].nodeValue == 'right') {
                         finalId = lastNumber[newId + 1].id;
+                        tl.from('#modalShow', 0.5, {x:1000})
                     } else if (
                         e.target.attributes[2].nodeValue == 'arrow-left'
                     ) {
                         finalId = lastNumber[newId - 1].id;
+                        tl.from('#modalShow', 0.5, {x:-1000})
                     }
 
                     me.id = finalId;
                     location.hash = me.id;
+                   
                     console.log(response);
                 })
                 .catch(() => {
