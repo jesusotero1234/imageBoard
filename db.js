@@ -1,5 +1,5 @@
 const spicePg = require('spiced-pg');
-
+    
 
 
 const db = spicePg( process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/imageboard')
@@ -10,7 +10,7 @@ exports.imagesData = function() {
     return db.query(
         `SELECT * FROM images
         ORDER BY id DESC
-        LIMIT 2`
+        LIMIT 6`
     )
 }
 
@@ -126,5 +126,15 @@ exports.likesTableforModal = function(imageID) {
         WHERE imageID =$1
         `,
         [imageID]
+    ).then(({rows})=> rows)
+}
+
+//Delete From Database
+exports.deleteImage = function(url) {
+    return db.query(
+        `DELETE FROM images 
+        WHERE url=$1
+        `,
+        [url]
     ).then(({rows})=> rows)
 }

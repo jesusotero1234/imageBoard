@@ -12,7 +12,8 @@ const {
     imageUrlData,
     saveLikes,
     likesTable,
-    likesTableforModal
+    likesTableforModal,
+    deleteImage
 } = require('./db.js'); //?
 const s3 = require('./s3');
 const { s3Url } = require('./config.json'); //?
@@ -142,7 +143,7 @@ app.post('/comments', (req, res) => {
                 });
             }
         );
-        console.log('check new obj', obj);
+        // console.log('check new obj', obj);
         res.json({ obj });
     });
 });
@@ -157,7 +158,23 @@ app.post('/saveComment', (req, res) => {
         req.body.id
     ).then(() => {
         comments(req.body.id).then(response => {
-            res.json({ response });
+            let obj = [];
+            //Converting dates with moment
+            response.rows.forEach(
+                ({ comment, created_at, id, image_id, username }) => {
+                    created_at = moment(created_at, 'YYYYMMDD').fromNow();
+
+                    obj.push({
+                        comment,
+                        created_at,
+                        id,
+                        image_id,
+                        username
+                    });
+                }
+            );
+            // console.log('check new obj', obj);
+            res.json({ obj });
         });
     });
 });
@@ -223,6 +240,16 @@ app.post('/updateLikeFromUser', (req, res) => {
 app.get('/likesTable/:id', (req, res) => {
     //this is going to be hooked up with the database
     likesTableforModal(req.params.id).then(response => res.json(response));
+});
+
+app.post('/deleteImg2', s3.deleteAWS, (req, res) => {
+    console.log('delete part',req.body)
+    deleteImage(req.body.url)
+        .then(() => {
+            
+        imagesData().then(resp =>res.json({resp}))
+        })
+        .catch(err => console.log(err));
 });
 
 app.listen(8080, () => console.log('server is running'));

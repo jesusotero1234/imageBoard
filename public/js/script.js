@@ -27,21 +27,21 @@ Vue.component('modal', {
         // // gsap.from('#modalShow', 2 ,{scale:0.3,y: -1000});
         console.log(this.offsetleft, this.offsettop);
         console.log('mounted');
-        gsap.from('#modalShow', 2, {
+        gsap.from('#modalShow', 0.5, {
             scale: 0,
             x: this.offsetleft - 640,
             y: this.offsettop - 640,
-            ease: 'bounce.out'
+            ease: 'elastic. out( 1, 0.3)'
         });
 
         // Arrows transition
 
-        gsap.from('.arrow-left', 2, {
+        gsap.from('.arrow-left', 0.5, {
             x: -1000,
             ease: 'slow( 0.7, 0.7, false)'
         });
 
-        gsap.from('.right', 2, {
+        gsap.from('.right', 0.5, {
             x: +1000,
             ease: 'slow( 0.7, 0.7, false)'
         });
@@ -49,12 +49,12 @@ Vue.component('modal', {
         //////
 
         this.changeId();
-        this.likeDataCheck()
+        this.likeDataCheck();
     },
     watch: {
         id: function() {
             this.changeId();
-            this.likeDataCheck()
+            this.likeDataCheck();
         }
     },
     methods: {
@@ -117,11 +117,11 @@ Vue.component('modal', {
                 .then(function(resp) {
                     console.log('resp from POST /saveComment', resp);
 
-                    me.comments = resp.data.response.rows;
+                    me.comments = resp.data.obj;
 
                     //CSS transition when adding comment
 
-                    gsap.from('.comment-transition', 1, {
+                    gsap.from('.comment-transition', 0.5, {
                         y: 'random(40,60)',
                         stagger: 0.1
                     });
@@ -189,7 +189,7 @@ Vue.component('modal', {
                         userData.liked != null
                     ) {
                         console.log('entered last part the likes button');
-                      return
+                        return;
                     }
                 }
 
@@ -197,8 +197,8 @@ Vue.component('modal', {
                     if (userData.dislike == null && userData.like !== null) {
                         me.dislike++;
                         console.log('check like', me.like);
-                        if(me.like !=0){
-                            me.like--
+                        if (me.like != 0) {
+                            me.like--;
                         }
                         axios
                             .post('/updateLikeFromUser', userUpdatedisLiked)
@@ -218,7 +218,7 @@ Vue.component('modal', {
                         userData.dislike == null &&
                         userData.liked != null
                     ) {
-                      return
+                        return;
                     }
                 }
             });
@@ -248,6 +248,18 @@ Vue.component('modal', {
                     me.dislike = dislikeCheck;
                 }
             });
+        },
+        deleteImg: function() {
+            var me = this;
+            console.log('Delete', this.imagedata.url);
+            let url2 = { url: this.imagedata.url };
+            axios
+                .post('/deleteImg2', url2)
+                .then(response => {
+                    console.log(response);
+                    me.$emit('closedelete');
+                })
+                .catch(err => console.log(err));
         }
     }
 });
@@ -256,6 +268,7 @@ new Vue({
     el: '#main',
     data: {
         images: [],
+        urls: [],
         title: '',
         description: '',
         username: '',
@@ -268,7 +281,10 @@ new Vue({
         comments: []
     }, //data ends
     mounted: function() {
-        console.log('the Vue component has mounted!');
+        console.log('the Vue component has mounted!', this.id);
+
+        gsap.from('#logo', 0.5, { opacity: 0, ease: 'power1.out' });
+        gsap.from('#logo', 0.5, { scale: 0.3 });
 
         //We use me = this because in axios we dont use arrow function, so we have to bind this into it.
         var me = this;
@@ -290,11 +306,24 @@ new Vue({
                 const timeline = new TimelineLite();
                 console.log(me.$refs, 'timeline', timeline);
 
-                gsap.from('.form', 1, { y: 'random(40,60)', stagger: 0.25 });
-                timeline.from(box, 3, {
-                    x: 'random(1500,1000)',
-                    scale: 0.3,
-                    stagger: 0.25
+                // gsap.to('.form', 1, { x: 400})
+                gsap.from('.form', 0.5, {
+                    y: 400,
+                    stagger: {
+                        amount: 0.3,
+                        from: 'edges',
+                        grid: 'auto',
+                        ease: 'power3.inOut'
+                    }
+                });
+                timeline.from(box, 1, {
+                    // x: 'random(1500,1000)',
+                    scale: 0.1,
+                    stagger: {
+                        amount: 1.5,
+                        from: 'center',
+                        grid: 'auto'
+                    }
                     // ease: 'bounce.out'
                 });
                 // timeline.to(box, 5, { x: 0, scale: 1 })
@@ -304,7 +333,59 @@ new Vue({
             me.id = location.hash.slice(1);
         });
     },
+    watch: {
+        urls: function() {
+            this.urls.forEach(element => {
+                console.log('checkArrayUrl', this.urls);
+                let test = document.querySelector(`img[src='${element}']`);
+                console.log(test);
+                gsap.from(test, 1, { x: -1000 });
+            });
+        }
+    },
     methods: {
+        refresh: function() {
+            var me = this;
+
+            axios
+                .get('/images')
+                .then(function(response) {
+                    console.log(response.data.rows);
+                    if (response.data.rows) {
+                        me.images = response.data.rows;
+                        me.addButton = true;
+                    }
+                })
+                .catch(err => console.log(err))
+                .then(() => {
+                    //Creating some CSS to the boxes when they start
+
+                    const { box } = me.$refs;
+                    const timeline = new TimelineLite();
+                    console.log(me.$refs, 'timeline', timeline);
+
+                    // gsap.to('.form', 1, { x: 400})
+                    gsap.from('.form', 0.5, {
+                        y: 400,
+                        stagger: {
+                            amount: 0.3,
+                            from: 'edges',
+                            grid: 'auto',
+                            ease: 'power3.inOut'
+                        }
+                    });
+                    timeline.from(box, 1, {
+                        // x: 'random(1500,1000)',
+                        scale: 0.1,
+                        stagger: {
+                            amount: 1.5,
+                            from: 'center',
+                            grid: 'auto'
+                        }
+                        // ease: 'bounce.out'
+                    });
+                });
+        },
         handleClick: function(e) {
             e.preventDefault();
 
@@ -313,12 +394,16 @@ new Vue({
             console.log('clicked', this);
 
             //Check if all the input fields has been added filled
-
+            console.log(
+                'Before Error uploading',
+                this.title.trim(),
+                this.description.trim(),
+                this.username.trim()
+            );
             if (
                 !this.title.trim() ||
-                this.description.trim() ||
-                this.username.trim() ||
-                this.file.trim()
+                !this.description.trim() ||
+                !this.username.trim()
             ) {
                 return (this.error =
                     'Please fill all the information before uploading an image');
@@ -339,6 +424,11 @@ new Vue({
                     console.log('resp from POST /upload', resp);
                     //send image to the array
                     me.images.unshift(resp.data.newImage);
+                    console.log('Array despues de subida', me.images, me.id);
+                    me.refresh()
+                    me.username =''
+                    me.title = ''
+                    me.description = ''
                 })
                 .catch(err => console.log(err));
         },
@@ -352,27 +442,81 @@ new Vue({
         },
         imageClicked: function(id) {
             console.log('clicked ImageClicked');
-            if (!this.id) {
+            if (this.id == '') {
                 this.id = id;
                 console.log('imagedclicked', this);
             }
         },
         closeModal: function() {
             console.log('clicked CloseModal');
-            gsap.to('#modalShow', 1, {
-                scale: 0
+            gsap.to('#modalShow', 0.5, {
+                scale: 0,
+                y: 300
             });
             // this.id = null;
             var me = this;
             setTimeout(function() {
                 me.id = history.replaceState(null, null, ' ');
-            }, 1000);
+            }, 200);
+        },
+        closeModalFromDelete: function() {
+            console.log('clicked CloseModalFromDelete');
+            gsap.to('#modalShow', 0.5, {
+                scale: 0,
+                y: 300
+            });
+
+            // this.id = null;
+            var me = this;
+            setTimeout(function() {
+                me.id = history.replaceState(null, null, ' ');
+
+                axios
+                    .get('/images')
+                    .then(function(response) {
+                        console.log(response.data.rows);
+                        if (response.data.rows) {
+                            me.images = response.data.rows;
+                            me.addButton = true;
+                        }
+                    })
+                    .catch(err => console.log(err))
+                    .then(() => {
+                        //Creating some CSS to the boxes when they start
+
+                        const { box } = me.$refs;
+                        const timeline = new TimelineLite();
+                        console.log(me.$refs, 'timeline', timeline);
+
+                        // gsap.to('.form', 1, { x: 400})
+                        gsap.from('.form', 0.5, {
+                            y: 400,
+                            stagger: {
+                                amount: 0.3,
+                                from: 'edges',
+                                grid: 'auto',
+                                ease: 'power3.inOut'
+                            }
+                        });
+                        timeline.from(box, 1, {
+                            // x: 'random(1500,1000)',
+                            scale: 0.1,
+                            stagger: {
+                                amount: 1.5,
+                                from: 'center',
+                                grid: 'auto'
+                            }
+                            // ease: 'bounce.out'
+                        });
+                        // timeline.to(box, 5, { x: 0, scale: 1 })
+                    });
+            }, 200);
         },
         elementInfo: function(e) {
             this.offsetleft = e.clientX;
             this.offsettop = e.clientY;
 
-            // console.log(e.offsetLeft, 'test', e);
+            // console.log("elementInfo",e);
         },
         addMoreImages: function() {
             let lastImgId = '';
@@ -387,13 +531,11 @@ new Vue({
             axios
                 .get(`/getMoreImages/${lastImgId}`)
                 .then(resp => {
-                    // console.log('resp form addMoreImages', resp);
-                    //data from addMoreImages is resp.data.response
-                    //data from finished (to check the last one) is resp.data.resp
-
+                    console.log('addMoreImages', resp);
                     //push the new images to the images array
                     resp.data.response.forEach(newImg => {
                         me.images.push(newImg);
+                        me.urls.push(newImg.url);
 
                         resp.data.resp1.forEach(checkId => {
                             // console.group(el)
@@ -402,6 +544,7 @@ new Vue({
                             }
                         });
                     });
+                    
                 })
                 .catch(err => console.log(err));
         },
