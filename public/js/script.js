@@ -21,7 +21,7 @@ Vue.component('modal', {
     mounted: function() {
         //we can do axios request
 
-        //CSS for the modal
+        //CSS for the moda
 
         console.log('ref from modal', this.$refs);
         // // gsap.from('#modalShow', 2 ,{scale:0.3,y: -1000});
@@ -283,9 +283,69 @@ new Vue({
     mounted: function() {
         console.log('the Vue component has mounted!', this.id);
 
-        gsap.from('#logo', 0.5, { opacity: 0, ease: 'power1.out' });
-        gsap.from('#logo', 0.5, { scale: 0.3 });
+        //Animating the beans
 
+        gsap.registerPlugin(MotionPathPlugin);
+
+        // const flightPath = {
+        //     curviness: 2,
+        //     autoRotate: false,
+        //     path: [
+        //         { x: 100, y: -20, scale:2 },
+        //         { x: 200, y: 0 ,scale:1.7},
+        //         { x: 300, y: 10, scale:1.5 },
+        //         { x: 450, y: 130, scale:1.3 },
+        //         { x: 700, y: 100,scale:1 }
+        //     ]
+        // };
+        const flightPath = {
+            curviness: 1.5,
+            autoRotate: true,
+            path: [
+                { x: 100, y: -20, scale:2 },
+                { x: 200, y: 0 ,scale:1.7},
+                { x: 300, y: 10, scale:1.5 },
+                { x: 450, y: 130, scale:1.3 },
+                { x: 700, y: 100,scale:1 }
+            ]
+        };
+
+        gsap.from('#beans', 1, {
+            opacity: 0,
+            x: -150,
+            delay: 1,
+        });
+        gsap.to('#beans', 4, {
+            delay: 1,
+            motionPath: flightPath,
+            ease: "sine.inOut"
+        });
+
+        const flightPath2 = {
+            curviness: 1.25,
+            autoRotate: true,
+            path: [
+                { x: -100, y: -20,scale:2 },
+                { x: -200, y: 0, scale:1.7 },
+                { x: -250, y: 10,scale:1.5 },
+                { x: -350, y: 120,scale:1.3 },
+                { x: -610, y: 100,scale:1 }
+            ]
+        };
+
+        gsap.from('#beans2', 1, {
+            opacity: 0,
+            x: 150,
+            delay: 1,
+        });
+
+        gsap.to('#beans2', 4, {
+            delay: 1,
+            motionPath: flightPath2,
+            ease:  "sine.inOut"
+        });
+
+        //
         //We use me = this because in axios we dont use arrow function, so we have to bind this into it.
         var me = this;
 
@@ -306,11 +366,15 @@ new Vue({
                 const timeline = new TimelineLite();
                 console.log(me.$refs, 'timeline', timeline);
 
+                gsap.from('#logo', 0.5, { opacity: 0, ease: 'power1.out' });
+                timeline.from('#logo', 0.5, { scale: 0.3 });
+
                 // gsap.to('.form', 1, { x: 400})
-                gsap.from('.form', 0.5, {
-                    y: 400,
+                timeline.from('.form', 0.5, {
+                    y: 50,
+                    opacity: 0,
                     stagger: {
-                        amount: 0.3,
+                        amount: 0.5,
                         from: 'edges',
                         grid: 'auto',
                         ease: 'power3.inOut'
@@ -320,7 +384,7 @@ new Vue({
                     // x: 'random(1500,1000)',
                     scale: 0.1,
                     stagger: {
-                        amount: 1.5,
+                        amount: 0.3,
                         from: 'center',
                         grid: 'auto'
                     }
@@ -337,11 +401,12 @@ new Vue({
         urls: function() {
             this.urls.forEach(element => {
                 console.log('checkArrayUrl', this.urls);
-                
-                setTimeout(function(){
+
+                setTimeout(function() {
                     let test = document.querySelector(`img[src='${element}']`);
                     console.log(test);
-                    gsap.from(test, 1, { x: -1000 });},10)
+                    gsap.from(test, 1, { x: -1000 });
+                }, 1);
             });
         }
     },
@@ -427,10 +492,10 @@ new Vue({
                     //send image to the array
                     me.images.unshift(resp.data.newImage);
                     console.log('Array despues de subida', me.images, me.id);
-                    me.refresh()
-                    me.username =''
-                    me.title = ''
-                    me.description = ''
+                    me.refresh();
+                    me.username = '';
+                    me.title = '';
+                    me.description = '';
                 })
                 .catch(err => console.log(err));
         },
@@ -534,9 +599,9 @@ new Vue({
                 .get(`/getMoreImages/${lastImgId}`)
                 .then(resp => {
                     console.log('addMoreImages', resp);
-                    
+
                     //this  makes a refresh to the array
-                    me.urls= []
+                    me.urls = [];
 
                     resp.data.response.forEach(newImg => {
                         me.images.push(newImg);
@@ -549,7 +614,6 @@ new Vue({
                             }
                         });
                     });
-                    
                 })
                 .catch(err => console.log(err));
         },
@@ -561,7 +625,6 @@ new Vue({
             console.log(e.target.attributes[2]);
             var me = this;
             var tl = new TimelineLite();
-           
 
             // setTimeout(function)
             axios
@@ -570,7 +633,7 @@ new Vue({
                     let lastNumber = response.data.sort(function(a, b) {
                         return b - a;
                     });
-                   
+
                     //check the id in the array
                     // tl.from('#modalShow', 1, {x:-1000})
                     let newId = '';
@@ -591,17 +654,17 @@ new Vue({
                     let finalId = '';
                     if (e.target.attributes[2].nodeValue == 'right') {
                         finalId = lastNumber[newId + 1].id;
-                        tl.from('#modalShow', 0.5, {x:1000})
+                        tl.from('#modalShow', 0.5, { x: 1000 });
                     } else if (
                         e.target.attributes[2].nodeValue == 'arrow-left'
                     ) {
                         finalId = lastNumber[newId - 1].id;
-                        tl.from('#modalShow', 0.5, {x:-1000})
+                        tl.from('#modalShow', 0.5, { x: -1000 });
                     }
 
                     me.id = finalId;
                     location.hash = me.id;
-                   
+
                     console.log(response);
                 })
                 .catch(() => {

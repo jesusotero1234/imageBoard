@@ -244,11 +244,10 @@ app.get('/likesTable/:id', (req, res) => {
 });
 
 app.post('/deleteImg2', s3.deleteAWS, (req, res) => {
-    console.log('delete part',req.body)
+    console.log('delete part', req.body);
     deleteImage(req.body.url)
         .then(() => {
-            
-        imagesData().then(resp =>res.json({resp}))
+            imagesData().then(resp => res.json({ resp }));
         })
         .catch(err => console.log(err));
 });
